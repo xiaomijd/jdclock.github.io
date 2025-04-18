@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>公出打卡系统</title>
+    <style>
+        body {
+            font-family: '微软雅黑', sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            background: url('https://jdrdl.jd.com/assets/img/ipImg05.png') center/cover fixed;
+            position: relative;
+        }
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255,255,255,0.7);
+            backdrop-filter: blur(3px);
+            z-index: -1;
+        }
+
+        /* [重点修改] 容器透明度优化 */
+        .container {
+            background: rgba(255, 255, 255, 0.82);
+            backdrop-filter: blur(1px);
+            margin: 60px 20px 20px;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.3);
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+        }
+
+        /* 确保文字清晰 */
+        h1 {
+            font-size: 1.5rem;
+            color: #333;
+            text-align: center;
+            margin-bottom: 20px;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #444;
+            font-weight: 500;
+        }
+
+        /* 输入框微透明但保持可读性 */
+        input, select, .upload-btn {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid rgba(0,0,0,0.1);
+            border-radius: 4px;
+            font-size: 14px;
+            background: rgba(255,255,255,0.9);
+            transition: all 0.3s;
+        }
+        input:focus, select:focus {
+            outline: 2px solid rgba(33, 150, 243, 0.5);
+            background: rgba(255,255,255,0.95);
+        }
+
+        /* 其他元素保持原样 */
+        .input-group {
+            margin-bottom: 15px;
+        }
+        .upload-btn {
+            color: white;
+            background: #2196F3;
+            text-align: center;
+            cursor: pointer;
+        }
+        .thumbnail {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 4px;
+            margin-top: 10px;
+            display: block;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+        .upload-success {
+            color: #4CAF50;
+            font-size: 13px;
+            margin-top: 5px;
+            display: inline-block;
+        }
+        .submit-btn {
+            width: 100%;
+            padding: 12px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <a href="#records" class="admin-link" onclick="showRecords()" style="
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: rgba(0,0,0,0.7);
+        color: white;
+        padding: 8px 12px;
+        border-radius: 20px;
+        text-decoration: none;
+        font-size: 14px;
+    ">同事打卡记录</a>
+    
+    <div class="container" id="form-page">
+        <h1>小米京东事业部全天公出打卡</h1>
+        
+        <div class="input-group">
+            <label>姓名</label>
+            <input type="text" id="username" required>
+        </div>
+
+        <div class="input-group">
+            <label>公出时间</label>
+            <input type="date" id="date" required>
+        </div>
+
+        <div class="input-group">
+            <label>公出理由</label>
+            <input type="text" id="reason" required>
+        </div>
+
+        <div class="input-group">
+            <label>上传打卡图片</label>
+            <button class="upload-btn" onclick="document.getElementById('albumInput').click()">从相册选择</button>
+            <input type="file" id="albumInput" accept="image/*" hidden>
+            <div id="previewArea" style="margin-top: 10px; display: none;">
+                <img id="previewImg" class="thumbnail">
+                <span class="upload-success">✓ 图片上传成功</span>
+            </div>
+        </div>
+
+        <button class="submit-btn" id="submitBtn">确认提交</button>
+    </div>
+
+    <script>
+        // JavaScript部分保持不变...
+    </script>
+</body>
+</html>
