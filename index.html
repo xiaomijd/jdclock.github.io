@@ -2,15 +2,16 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>公出打卡系统</title>
     <style>
+        /* 基础样式 */
         body {
             font-family: '微软雅黑', sans-serif;
             margin: 0;
             padding: 0;
             min-height: 100vh;
-            background: url('https://jdrdl.jd.com/assets/img/ipImg01.png') center/cover fixed;
+            background: url('https://img12.360buyimg.com/n5/s720x720_jfs/t1/227829/24/16610/158137/66190e66F5de89b66/dfbb1d1ae517a63f.jpg.avif') center/cover fixed;
             position: relative;
         }
         body::before {
@@ -25,7 +26,19 @@
             z-index: -1;
         }
 
-        /* [修改] 主容器层级 */
+        /* [修复] 主标题强制一行显示 */
+        h1 {
+            font-size: 1.5rem;
+            color: #333;
+            text-align: center;
+            margin-bottom: 20px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            padding: 0 10px;
+        }
+
+        /* 容器样式 */
         .container {
             background: rgba(255, 255, 255, 0.82);
             backdrop-filter: blur(1px);
@@ -38,7 +51,7 @@
             z-index: 1;
         }
 
-        /* [新增] 同事打卡记录按钮置顶 */
+        /* 打卡记录按钮 */
         .admin-link {
             position: fixed;
             top: 15px;
@@ -53,7 +66,7 @@
             box-shadow: 0 2px 10px rgba(0,0,0,0.2);
         }
 
-        /* [重写] 记录页面全屏覆盖 */
+        /* 记录页面全屏覆盖 */
         #records-page {
             display: none;
             position: fixed;
@@ -67,14 +80,7 @@
             overflow-y: auto;
         }
 
-        /* 其他原有样式保持不变... */
-        h1 {
-            font-size: 1.5rem;
-            color: #333;
-            text-align: center;
-            margin-bottom: 20px;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.1);
-        }
+        /* 输入区域样式 */
         .input-group {
             margin-bottom: 15px;
         }
@@ -92,12 +98,21 @@
             font-size: 14px;
             background: rgba(255,255,255,0.9);
         }
+        
+        /* [修改] 上传按钮文字说明 */
         .upload-btn {
             color: white;
             background: #2196F3;
             text-align: center;
             cursor: pointer;
         }
+        .upload-hint {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        /* 缩略图样式 */
         .thumbnail {
             width: 80px;
             height: 80px;
@@ -105,6 +120,7 @@
             border-radius: 4px;
             margin-top: 10px;
             display: block;
+            cursor: pointer;
         }
         .upload-success {
             color: #4CAF50;
@@ -112,6 +128,8 @@
             margin-top: 5px;
             display: inline-block;
         }
+
+        /* 提交按钮 */
         .submit-btn {
             width: 100%;
             padding: 12px;
@@ -123,6 +141,8 @@
             cursor: pointer;
             margin-top: 10px;
         }
+
+        /* 记录条目样式 */
         .record-item {
             background: rgba(255,255,255,0.9);
             padding: 15px;
@@ -130,10 +150,36 @@
             margin-bottom: 15px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
+
+        /* [新增] 图片预览模态框 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 2000;
+            text-align: center;
+        }
+        .modal img {
+            max-width: 90%;
+            max-height: 90%;
+            margin-top: 5%;
+        }
+        .close-modal {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: white;
+            font-size: 30px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
-    <!-- [修改] 按钮改为固定定位 -->
+    <!-- 同事打卡记录按钮 -->
     <a href="#records" class="admin-link" onclick="showRecords()">同事打卡记录</a>
     
     <!-- 主表单容器 -->
@@ -156,8 +202,10 @@
         </div>
 
         <div class="input-group">
-            <label>上传打卡图片</label>
+            <!-- [修改] 上传图片字段说明 -->
+            <label>上传打卡图片（图片内需体现日期和拍摄时间）</label>
             <button class="upload-btn" onclick="document.getElementById('albumInput').click()">从相册选择</button>
+            <div class="upload-hint">请确保照片中包含日期和时间信息</div>
             <input type="file" id="albumInput" accept="image/*" hidden>
             <div id="previewArea" style="margin-top: 10px; display: none;">
                 <img id="previewImg" class="thumbnail">
@@ -168,7 +216,7 @@
         <button class="submit-btn" id="submitBtn">确认提交</button>
     </div>
 
-    <!-- [修改] 全屏覆盖式记录页面 -->
+    <!-- 同事打卡记录页面 -->
     <div id="records-page">
         <div style="max-width: 600px; margin: 0 auto;">
             <h2 style="text-align: center; margin-bottom: 20px;">同事打卡记录</h2>
@@ -177,7 +225,27 @@
         </div>
     </div>
 
+    <!-- [新增] 图片预览模态框 -->
+    <div class="modal" id="imageModal">
+        <span class="close-modal" onclick="closeModal()">&times;</span>
+        <img id="modalImage">
+    </div>
+
     <script>
+        // 存储打卡记录
+        function saveRecord() {
+            const record = {
+                name: document.getElementById('username').value,
+                date: document.getElementById('date').value,
+                reason: document.getElementById('reason').value,
+                photo: document.getElementById('previewImg').src
+            };
+
+            let records = JSON.parse(localStorage.getItem('records') || '[]');
+            records.push(record);
+            localStorage.setItem('records', JSON.stringify(records));
+        }
+
         // 图片上传处理
         document.getElementById('albumInput').addEventListener('change', function(e) {
             const file = e.target.files[0];
@@ -196,39 +264,79 @@
             document.getElementById('form-page').style.display = 'none';
             document.getElementById('records-page').style.display = 'block';
             
-            // 模拟数据（实际应从localStorage读取）
-            document.getElementById('records-list').innerHTML = `
+            const records = JSON.parse(localStorage.getItem('records') || '[]');
+            const recordsList = document.getElementById('records-list');
+            
+            if (records.length === 0) {
+                recordsList.innerHTML = '<p style="text-align:center;color:#666;">暂无打卡记录</p>';
+                return;
+            }
+
+            recordsList.innerHTML = records.map(record => `
                 <div class="record-item">
                     <div style="display: flex; align-items: center; margin-bottom: 10px;">
-                        <img src="https://via.placeholder.com/60" style="width: 50px; height: 50px; border-radius: 50%; margin-right: 10px;">
-                        <div>
-                            <strong>张三</strong>
-                            <div style="color: #666; font-size: 0.9em;">2023-08-20</div>
+                        <img src="${record.photo}" class="thumbnail" onclick="showImage('${record.photo}')">
+                        <div style="margin-left: 15px;">
+                            <strong>${record.name}</strong>
+                            <div style="color: #666; font-size: 0.9em;">${formatDate(record.date)}</div>
                         </div>
                     </div>
                     <div style="color: #333;">
-                        <strong>事由：</strong>拜访京东总部客户
+                        <strong>事由：</strong>${record.reason}
                     </div>
                 </div>
-                <div class="record-item">
-                    <div style="display: flex; align-items: center; margin-bottom: 10px;">
-                        <img src="https://via.placeholder.com/60" style="width: 50px; height: 50px; border-radius: 50%; margin-right: 10px;">
-                        <div>
-                            <strong>李四</strong>
-                            <div style="color: #666; font-size: 0.9em;">2023-08-19</div>
-                        </div>
-                    </div>
-                    <div style="color: #333;">
-                        <strong>事由：</strong>参加京东供应商大会
-                    </div>
-                </div>
-            `;
+            `).join('');
         }
 
-        // 提交功能
+        // [新增] 日期格式化
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return `${date.getFullYear()}年${date.getMonth()+1}月${date.getDate()}日`;
+        }
+
+        // [新增] 图片预览功能
+        function showImage(src) {
+            document.getElementById('modalImage').src = src;
+            document.getElementById('imageModal').style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('imageModal').style.display = 'none';
+        }
+
+        // 提交表单
         document.getElementById('submitBtn').addEventListener('click', function() {
+            if (!validateForm()) {
+                alert('请填写完整信息！');
+                return;
+            }
+            
+            saveRecord();
             alert('提交成功！');
+            window.location.reload();
         });
+
+        // 表单验证
+        function validateForm() {
+            const requiredFields = [
+                document.getElementById('username'),
+                document.getElementById('date'),
+                document.getElementById('reason'),
+                document.getElementById('albumInput')
+            ];
+            
+            let isValid = true;
+            requiredFields.forEach(field => {
+                if (!field.value) {
+                    isValid = false;
+                    field.style.borderColor = 'red';
+                } else {
+                    field.style.borderColor = '#ddd';
+                }
+            });
+            
+            return isValid;
+        }
     </script>
 </body>
 </html>
